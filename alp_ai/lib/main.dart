@@ -1,36 +1,56 @@
+import 'package:alp_ai/models/trash_record.dart';
+import 'package:alp_ai/viewmodels/home_viewmodel.dart';
+import 'package:alp_ai/views/history.dart';
+import 'package:alp_ai/views/home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  // 1. Ensure Flutter bindings are initialized before any async setup
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 2. Load the .env file (which contains your Gemini API Key)
+  await dotenv.load(fileName: ".env");
+
+  // 3. Initialize Hive Local Storage
+  await Hive.initFlutter();
+  
+  // Register the adapter for your TrashRecord model
+  // (Note: You must run 'flutter pub run build_runner build' to generate this adapter)
+  Hive.registerAdapter(TrashRecordAdapter());
+  
+  // Open the box used for history
+  await Hive.openBox<TrashRecord>('history');
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return MultiProvider(
+      providers: [
+        // 4. Provide the HomeViewModel to the entire app
+        ChangeNotifierProvider(create: (_) => HomeViewModel()),
+      ],
+      child: MaterialApp(
+        title: 'Trash Classifier AI',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          useMaterial3: true,
+        ),
+        // 5. Define the initial screen and routes
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const HomeScreen(),
+          '/history': (context) => const History(),
+        },
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
