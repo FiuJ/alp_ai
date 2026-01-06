@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
+// import 'main_navigation.dart';
 
 void main() async {
   // 1. Ensure Flutter bindings are initialized before any async setup
