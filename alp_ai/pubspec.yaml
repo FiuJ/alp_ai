@@ -30,8 +30,10 @@ environment:
 dependencies:
   camera: ^0.11.3
   cupertino_icons: ^1.0.8
+  dotenv: ^4.2.0
   flutter:
     sdk: flutter
+  flutter_dotenv: ^6.0.0
   google_generative_ai: ^0.4.7
   hive: ^2.2.3
   hive_flutter: ^1.1.0
@@ -51,6 +53,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
+    - .env
     - model_ai/labels.txt
     - model_ai/model.tflite
   # The following line ensures that the Material Icons font is
