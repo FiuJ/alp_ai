@@ -8,7 +8,7 @@ class ClassifierService {
   List<String>? _labels;
 
   Future<void> loadModel() async {
-    _interpreter = await Interpreter.fromAsset('model_ai/model.tflite');
+    _interpreter = await Interpreter.fromAsset('model_ai/model_unquant.tflite');
     final labelData = await rootBundle.loadString('model_ai/labels.txt');
     _labels = labelData.split('\n').where((s) => s.isNotEmpty).toList();
   }
