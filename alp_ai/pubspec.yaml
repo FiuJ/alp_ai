@@ -43,6 +43,7 @@ dependencies:
   printing: ^5.14.2
   provider: ^6.1.5+1
   tflite_flutter: ^0.12.1
+  fl_chart: ^0.66.0
 
 dev_dependencies:
   build_runner: ^2.4.8

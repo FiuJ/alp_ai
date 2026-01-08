@@ -78,13 +78,13 @@ class GeminiService {
       [Write 1 short, interesting sentence about this waste]
 
       HOW TO RECYCLE:
-      1. [First step]
-      2. [Second step]
-      3. [Third step]
+      [Provide a step-by-step guide on how to recycle or dispose of this item properly. 
+       Use a numbered list (1., 2., 3., etc.). 
+       Provide as many steps as necessary for proper recycling, do not limit to 3 steps.]
 
       Rules:
       - Do not use markdown formatting (no bolding, no italics, no #).
-      - Keep the steps short and imperative.
+      - Keep the steps concise, clear, and imperative.
       - Do not add any intro or outro text.
       ''';
 

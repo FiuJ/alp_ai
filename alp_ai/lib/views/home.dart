@@ -5,8 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/home_viewmodel.dart';
 import 'history.dart';
-
+import 'statistics.dart'; // <--- JANGAN LUPA IMPORT INI DI ATAS FILE
 // --- THEME CONSTANTS ---
+
 class AppTheme {
   static const Color darkGreen = Color(0xFF1B4332);
   static const Color primaryGreen = Color(0xFF2D6A4F);
@@ -100,15 +101,80 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     ),
                   ),
                 ),
-                actions: [
-                  _HistoryButton(onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const History()),
-                    );
-                  }),
-                  const SizedBox(width: 24),
-                ],
+                
+// ... di dalam SliverAppBar actions ...
+
+actions: [
+
+  // Tombol Statistik Baru
+
+  IconButton(
+
+    onPressed: () {
+
+      Navigator.push(
+
+        context,
+
+        MaterialPageRoute(builder: (context) => const StatisticsScreen()),
+
+      );
+
+    },
+
+    icon: Container(
+
+      padding: const EdgeInsets.all(8),
+
+      decoration: BoxDecoration(
+
+        color: Colors.white,
+
+        shape: BoxShape.circle,
+
+        boxShadow: [
+
+          BoxShadow(
+
+            color: Colors.black.withOpacity(0.05),
+
+            blurRadius: 10,
+
+          )
+
+        ],
+
+      ),
+
+      child: const Icon(Icons.bar_chart_rounded, color: AppTheme.darkGreen, size: 20),
+
+    ),
+
+  ),
+
+  
+
+  const SizedBox(width: 12),
+
+  
+
+  // Tombol History Lama (Tetap ada)
+
+  _HistoryButton(onPressed: () {
+
+    Navigator.push(
+
+      context,
+
+      MaterialPageRoute(builder: (context) => const History()),
+
+    );
+
+  }),
+
+  const SizedBox(width: 24),
+
+],
               ),
 
               SliverToBoxAdapter(
