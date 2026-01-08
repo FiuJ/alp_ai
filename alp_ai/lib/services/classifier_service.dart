@@ -24,9 +24,9 @@ class ClassifierService {
       return "Error: Gagal decode gambar";
     }
 
-    // PERBAIKAN 1: Gunakan copyResizeCropSquare (Wajib!)
-    // Teachable Machine memotong tengah (center crop), bukan menarik gambar (stretch).
-    // Jika pakai copyResize biasa, gambar jadi gepeng dan model bingung.
+    // --- PERBAIKAN PENTING ---
+    // Gunakan copyResizeCropSquare agar gambar dipotong tengah (Center Crop)
+    // seperti cara kerja Teachable Machine. JANGAN pakai copyResize biasa.
     var resized = img.copyResizeCropSquare(decoder, size: 224);
     
     // 2. Convert to input tensor [1, 224, 224, 3]
@@ -36,15 +36,14 @@ class ClassifierService {
           List.generate(3, (c) {
             var pixel = resized.getPixel(x, y);
             
-            // Ambil nilai RGB dari pixel
+            // Ambil nilai pixel
             double value = 0;
             if (c == 0) value = pixel.r.toDouble(); // Red
             if (c == 1) value = pixel.g.toDouble(); // Green
             if (c == 2) value = pixel.b.toDouble(); // Blue
 
-            // PERBAIKAN 2: Normalisasi Standar Teachable Machine (Wajib!)
-            // Rumus: (Value - 127.5) / 127.5 -> Hasilnya rentang -1.0 sampai 1.0
-            // Kode lama Anda: value / 255.0 -> Hasilnya 0.0 sampai 1.0 (Ini salah untuk TM)
+            // Normalisasi Standar Teachable Machine: (Value - 127.5) / 127.5
+            // Mengubah range 0..255 menjadi -1..1
             return (value - 127.5) / 127.5;
           })
         )
