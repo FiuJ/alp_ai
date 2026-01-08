@@ -5,8 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/home_viewmodel.dart';
 import 'history.dart';
-import 'statistics.dart'; // <--- JANGAN LUPA IMPORT INI DI ATAS FILE
-// --- THEME CONSTANTS ---
+import 'statistics.dart'; 
 
 class AppTheme {
   static const Color darkGreen = Color(0xFF1B4332);
@@ -339,7 +338,7 @@ class _ImageDisplayArea extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Upload a photo to classify waste',
+            'You can choose an image from your camera or gallery below',
             style: TextStyle(
               fontSize: 14,
               color: AppTheme.darkGreen.withOpacity(0.6),

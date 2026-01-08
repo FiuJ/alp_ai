@@ -49,7 +49,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
         title: const Text(
-          'Recycling Impact',
+          'Statistics',
           style: TextStyle(color: AppTheme.darkGreen, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -179,14 +179,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.emoji_events, color: Colors.white, size: 32),
+            child: const Icon(Icons.camera, color: Colors.white, size: 32),
           ),
           const SizedBox(width: 20),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "Total Recycled",
+                "Total Scanned Items",
                 style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
               Text(
