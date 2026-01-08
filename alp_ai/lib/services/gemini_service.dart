@@ -63,54 +63,51 @@ class GeminiService {
       debugPrint("--- SELESAI PENGECEKAN ---\n");
     }
   }
-
-  Future<String> getRecyclingSteps(String wasteType) async {
+Future<String> getRecyclingSteps(String wasteType) async {
     try {
       debugPrint("DEBUG GEMINI: Mengirim request untuk '$wasteType'...");
       
+      // --- UPDATE PROMPT AGAR SESUAI KRITERIA ANDA ---
       final prompt = '''
-      You are a helpful eco-friendly recycling assistant.
-      I have a piece of waste identified as: "$wasteType".
+      Kamu adalah asisten lingkungan yang bijak.
+      Saya memiliki sampah yang teridentifikasi sebagai: "$wasteType".
 
-      Please provide a response following STRICTLY this format:
+      Berikan respons dalam BAHASA INDONESIA. Ikuti format berikut agar aplikasi dapat membacanya:
 
       FUN FACT:
-      [Write 1 short, interesting sentence about this waste]
+      [Jelaskan DAMPAK LINGKUNGAN dari sampah ini secara informatif. 
+       Contoh: Berapa lama terurai? Apa bahayanya bagi tanah/laut jika dibuang sembarangan? 
+       Maksimal 2-3 kalimat.]
 
       HOW TO RECYCLE:
-      [Provide a step-by-step guide on how to recycle or dispose of this item properly. 
-       Use a numbered list (1., 2., 3., etc.). 
-       Provide as many steps as necessary for proper recycling, do not limit to 3 steps.]
+      [Berikan panduan lengkap berupa poin-poin:
+       1. Peringatan KESELAMATAN (jika benda ini tajam/beracun/berbahaya).
+       2. Langkah membersihkan atau mempersiapkan sampah tersebut.
+       3. Cara menyalurkannya ke bank sampah atau tempat daur ulang.
+       4. Berikan 1-2 ide KREATIF (UPCYCLING) untuk menggunakan kembali barang ini di rumah.]
 
-      Rules:
-      - Do not use markdown formatting (no bolding, no italics, no #).
-      - Keep the steps concise, clear, and imperative.
-      - Do not add any intro or outro text.
+      Aturan:
+      - Header "FUN FACT:" dan "HOW TO RECYCLE:" JANGAN DIUBAH (Wajib Bahasa Inggris).
+      - Isi konten WAJIB Bahasa Indonesia yang mudah dipahami.
+      - Gunakan format list angka (1., 2., dst) pada bagian langkah.
+      - Jangan gunakan bold/italic/markdown.
       ''';
 
       final content = [Content.text(prompt)];
       final response = await _model.generateContent(content);
 
       debugPrint("DEBUG GEMINI: Berhasil menerima respon!");
-      return response.text ?? "Could not fetch info at this time.";
+      return response.text ?? "Maaf, tidak dapat mengambil informasi saat ini.";
 
     } catch (e) {
-      // --- PENANGANAN ERROR KUOTA ---
       String errorMsg = e.toString();
       debugPrint("❌ Gemini Error: $errorMsg");
 
       if (errorMsg.contains("429") || errorMsg.toLowerCase().contains("quota")) {
-        debugPrint("⚠️ KUOTA HABIS (Rate Limit Exceeded). Coba ganti model di kode ke 'gemini-1.5-flash'.");
-        return "Kuota AI habis (Limit Free Tier). Tunggu 1 menit atau ganti API Key.";
+        return "Kuota AI habis. Mohon tunggu sebentar.";
       } 
-      else if (errorMsg.contains("400") || errorMsg.toLowerCase().contains("key")) {
-        return "API Key Salah/Tidak Valid. Cek .env Anda.";
-      }
-      else if (errorMsg.contains("SocketException")) {
-        return "Tidak ada koneksi internet.";
-      }
-
-      return "Gagal terhubung ke AI. Coba lagi nanti.";
+      
+      return "Gagal terhubung ke AI. Periksa koneksi internet Anda.";
     }
   }
 }
