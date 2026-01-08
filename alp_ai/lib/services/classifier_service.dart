@@ -27,7 +27,8 @@ class ClassifierService {
         List.generate(224, (k) => 
           List.generate(3, (l) {
             var pixel = resized.getPixel(k, j);
-            return [pixel.r, pixel.g, pixel.b][l] / 255.0;
+            // return [pixel.r, pixel.g, pixel.b][l] / 255.0;
+            return ([pixel.r, pixel.g, pixel.b][l] / 127.5) - 1.0;
           })
         )
       )
