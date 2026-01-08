@@ -418,46 +418,75 @@ class _ProcessingState extends StatelessWidget {
     );
   }
 }
-
 class _ResultPanel extends StatelessWidget {
   final String result;
   final String? recommendation;
 
   const _ResultPanel({
+    super.key, // Tambahkan super.key best practice
     required this.result,
     this.recommendation,
   });
 
   @override
   Widget build(BuildContext context) {
+    // 1. Parsing logic: Memisahkan Fun Fact dan Langkah-langkah
+    String funFact = "";
+    List<String> steps = [];
+
+    if (recommendation != null) {
+      final text = recommendation!;
+      
+      // Coba parsing sederhana berdasarkan format prompt Gemini
+      if (text.contains("HOW TO RECYCLE:")) {
+        final parts = text.split("HOW TO RECYCLE:");
+        
+        // Ambil Fun Fact (hapus label 'FUN FACT:')
+        funFact = parts[0].replaceAll("FUN FACT:", "").trim();
+        
+        // Ambil langkah-langkah (split berdasarkan baris baru)
+        final rawSteps = parts[1].trim().split("\n");
+        steps = rawSteps
+            .where((s) => s.trim().isNotEmpty)
+            .map((s) => s.replaceAll(RegExp(r'^\d+\.\s*'), '')) // Hapus nomor bawaan teks (1., 2.)
+            .toList();
+      } else {
+        // Fallback jika format tidak sesuai
+        funFact = text; 
+      }
+    }
+
     return ClipRRect(
       borderRadius: AppTheme.cardRadius,
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withOpacity(0.95), // Sedikit lebih solid agar teks terbaca
             borderRadius: AppTheme.cardRadius,
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
             boxShadow: [AppTheme.softShadow],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header
+              // --- HEADER (Hasil Klasifikasi) ---
               Container(
-                padding: const EdgeInsets.all(24),
-                color: AppTheme.primaryGreen.withOpacity(0.05),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryGreen.withOpacity(0.08),
+                  border: Border(bottom: BorderSide(color: AppTheme.primaryGreen.withOpacity(0.1))),
+                ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(12),
                       decoration: const BoxDecoration(
                         color: AppTheme.primaryGreen,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
+                      child: const Icon(Icons.check_circle_outline, color: Colors.white, size: 28),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -465,21 +494,22 @@ class _ResultPanel extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Detected Material".toUpperCase(), // FIXED HERE
+                            "IDENTIFIED OBJECT",
                             style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1,
+                              color: AppTheme.darkGreen.withOpacity(0.6),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            result,
+                            result, // Menampilkan hasil klasifikasi (misal: "Plastic Bottle")
                             style: const TextStyle(
                               color: AppTheme.darkGreen,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              height: 1.2,
                             ),
                           ),
                         ],
@@ -488,34 +518,134 @@ class _ResultPanel extends StatelessWidget {
                   ],
                 ),
               ),
-              
-              // Body
+
+              // --- BODY CONTENT ---
               Padding(
                 padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Recycling Guide",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.darkGreen,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    recommendation == null
-                        ? _buildShimmerLines()
-                        : Text(
-                            recommendation!,
-                            style: TextStyle(
-                              fontSize: 15,
-                              height: 1.6,
-                              color: Colors.grey[800],
+                child: recommendation == null
+                    ? _buildShimmerLoading()
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 1. Fun Fact Card
+                          if (funFact.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 24),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8F5E9), // Light green background
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.2)),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.lightbulb_outline, color: AppTheme.primaryGreen, size: 22),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "Did you know?",
+                                          style: TextStyle(
+                                            color: AppTheme.primaryGreen,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          funFact,
+                                          style: TextStyle(
+                                            color: AppTheme.darkGreen.withOpacity(0.8),
+                                            fontSize: 14,
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                  ],
-                ),
+
+                          // 2. Recycling Steps Header
+                          if (steps.isNotEmpty) ...[
+                            Row(
+                              children: [
+                                Icon(Icons.recycling, color: AppTheme.darkGreen.withOpacity(0.7), size: 20),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  "Recycling Steps",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppTheme.darkGreen,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            // 3. List of Steps
+                            ...steps.asMap().entries.map((entry) {
+                              int idx = entry.key + 1;
+                              String stepText = entry.value;
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 24,
+                                      height: 24,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.darkGreen,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppTheme.darkGreen.withOpacity(0.3),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          )
+                                        ],
+                                      ),
+                                      child: Text(
+                                        "$idx",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        stepText,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          height: 1.5,
+                                          color: Colors.grey[800],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ] else ...[
+                            // Tampilkan teks raw jika parsing gagal
+                            Text(
+                              funFact,
+                              style: const TextStyle(color: Colors.black87),
+                            )
+                          ]
+                        ],
+                      ),
               ),
             ],
           ),
@@ -524,15 +654,32 @@ class _ResultPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildShimmerLines() {
+  // Efek loading saat menunggu respons AI
+  Widget _buildShimmerLoading() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(height: 12, width: 200, color: Colors.grey[200]),
-        const SizedBox(height: 8),
-        Container(height: 12, width: double.infinity, color: Colors.grey[200]),
-        const SizedBox(height: 8),
-        Container(height: 12, width: 150, color: Colors.grey[200]),
+        Container(
+          height: 80,
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Container(height: 16, width: 120, color: Colors.grey[100]),
+        const SizedBox(height: 12),
+        for (int i = 0; i < 3; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              children: [
+                Container(width: 24, height: 24, decoration: BoxDecoration(color: Colors.grey[100], shape: BoxShape.circle)),
+                const SizedBox(width: 12),
+                Expanded(child: Container(height: 14, color: Colors.grey[100])),
+              ],
+            ),
+          ),
       ],
     );
   }
